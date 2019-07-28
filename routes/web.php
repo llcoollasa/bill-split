@@ -16,3 +16,7 @@ Route::get('/', function () {
 });
 
 Route::post('/upload', 'BillController@handleUpload');
+
+Route::get('/output', function () {
+    return view('bill.output');
+});

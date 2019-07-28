@@ -6,9 +6,9 @@ use Illuminate\Http\UploadedFile;
 class SplitBillService implements SplitBillServiceInterface
 {
     // TODO: Handlle following methods
-    // Total number of days
-    // Total amount spent by all friends
-    // How much each friend has spent. (If I bring someone outside of the circle, then it comes under my account )
+    // Total number of days [done]
+    // Total amount spent by all friends [done]
+    // How much each friend has spent. (If I bring someone outside of the circle, then it comes under my account ) [done]
     // How much each user owes. (If there are minus values the ignore them)
     // Automatically generated a settlement combination. 
 
@@ -80,5 +80,45 @@ class SplitBillService implements SplitBillServiceInterface
 
     public function getTotalDays() { 
         return count($this->jsonArray);
+    }
+
+    public function getTotalSpentAmount() {
+        return $this->jsonArray->reduce(function ($carry, $item) {
+            return $carry + $item['amount'];
+        }, 0);
+    }
+
+    public function getTotalAmountSpentByEachFriend() {
+        return $this->jsonArray->reduce(function ($carry, $item) {
+            $key = $item['paid_by'];
+
+            if (empty($carry[$key])) {
+                $carry[$key] = $item['amount'];
+            } else {
+                $carry[$key] += $item['amount'];
+            }
+            
+            return $carry;
+        }, []);
+    }
+
+    public function getEachFriendOwesAmount() {
+        return $this->jsonArray->reduce(function ($carry, $item) {
+            $paidBy = $item['paid_by'];
+            $amount = $item['amount'];
+            $friendsCount = count($item['friends']);
+            $perHead = $amount > $friendsCount ? round($amount / $friendsCount, 2) : 0;
+            
+            foreach ($item['friends'] as $friend) {
+                if ($paidBy != $friend) {
+                    if (empty($carry[$friend][$paidBy])) {
+                        $carry[$friend][$paidBy] = $perHead;
+                    } else {
+                        $carry[$friend][$paidBy] += $perHead;
+                    }
+                } 
+            }
+            return $carry;
+        }, []);
     }
 }

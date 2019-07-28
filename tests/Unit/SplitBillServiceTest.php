@@ -12,7 +12,7 @@ use App\Services\SplitBillService;
 
 class FileTest extends TestCase
 {
-    private function getJsonData() {
+    private function getJsonData($rest = '') {
         return '
         {
           "data": [
@@ -45,6 +45,7 @@ class FileTest extends TestCase
                 "liam"
               ]
             }
+            '. $rest .'
           ]
         }
       ';
@@ -80,5 +81,66 @@ class FileTest extends TestCase
       $splitBillService = new SplitBillService(); 
       $splitBillService->calculate($this->getJsonData());
       $this->assertEquals($splitBillService->getTotalDays(), 3);
+    }
+
+    public function test_get_total_amount_spent() {
+      $splitBillService = new SplitBillService(); 
+      $splitBillService->calculate($this->getJsonData());
+      $this->assertEquals($splitBillService->getTotalSpentAmount(), 250);
+    }
+
+    public function test_get_total_amount_spent_by_each_friend() {
+      $splitBillService = new SplitBillService(); 
+      $splitBillService->calculate($this->getJsonData());
+
+      $expectedArray = [
+        "tanu" => 50,
+        "kasun" => 100,
+        "liam" => 100
+      ];
+      
+      $this->assertEquals($splitBillService->getTotalAmountSpentByEachFriend(), $expectedArray);
+    }
+    
+    public function test_get_total_amount_spent_by_each_friend_with_duplicate_names() {
+      $splitBillService = new SplitBillService(); 
+      $splitBillService->calculate($this->getJsonData(', {
+        "day": 4,
+        "amount": 150,
+        "paid_by": "liam",
+        "friends": [
+          "liam",
+          "tanu",
+          "liam"
+        ]
+      }'));
+
+      $expectedArray = [
+        "tanu" => 50,
+        "kasun" => 100,
+        "liam" => 250
+      ];
+      
+      $this->assertEquals($splitBillService->getTotalAmountSpentByEachFriend(), $expectedArray);
+    }
+
+    public function test_each_friend_owes_amount() {
+      $splitBillService = new SplitBillService(); 
+      $splitBillService->calculate($this->getJsonData());
+
+      $expectedArray = [
+        "kasun" => [
+          "tanu" => 25.0
+        ],
+        "tanu" => [
+          "kasun" => 33.33,
+          "liam" => 33.33
+        ],
+        "liam" => [
+          "kasun" => 33.33
+        ]  
+      ];
+      
+      $this->assertEquals($splitBillService->getEachFriendOwesAmount(), $expectedArray);
     }
 }
