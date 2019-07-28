@@ -4,7 +4,7 @@ namespace App\Services;
 use App\Http\Requests\HandleUploadPost;
 use Carbon\Carbon;
 use Storage;
-
+use Illuminate\Http\UploadedFile;
 class SplitBillService implements SplitBillServiceInterface
 {
     // TODO: Handlle following methods
@@ -18,15 +18,8 @@ class SplitBillService implements SplitBillServiceInterface
     {
         $jsonContent = null;
         // File preparation
-        if ($request->hasFile('jsonFile')) { 
-            $fileName   = Carbon::now()->timestamp . '.json';
-             
-            $path = $request->file('jsonFile')->storeAs(
-                'files', $fileName, 'local'
-            );
-            
-            $fileContent = Storage::get($path);
-
+        if ($request->hasFile('jsonFile')) {
+            $fileContent = Storage::get($this->storeJsonFile($request->file('jsonFile')));
             $jsonContent = json_decode($fileContent, true);
         }
 
@@ -41,5 +34,19 @@ class SplitBillService implements SplitBillServiceInterface
         } else {
             throw new \Exception('Please provide JSON formatted text using file upload or in Text area');
         }
+    }
+
+    public function storeJsonFile(UploadedFile $uploadedFile) {
+        $fileName = Carbon::now()->timestamp . '.json';
+
+        return $uploadedFile->storeAs(
+            'files', $fileName, 'local'
+        );
+    }
+    
+    public function validateJsonSchema($jsonArray) {
+        $multiplied = $collection->map(function ($item, $key) {
+            return $item * 2;
+        });
     }
 }

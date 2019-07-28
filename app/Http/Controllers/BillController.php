@@ -12,7 +12,7 @@ class BillController extends Controller
             $response = $billSplitService->calculate($request);
 
             // test
-            var_dump($response);
+            return ($response);
         } catch (\Exception $ex) {
             return redirect('/')
                 ->withErrors($ex->getMessage());
