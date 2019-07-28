@@ -8,10 +8,11 @@ use App\Services\SplitBillServiceInterface;
 class BillController extends Controller
 {
     public function handleUpload(HandleUploadPost $request, SplitBillServiceInterface $billSplitService) {
-        $jsonContent = null;
-
         try {
-            $billSplitService->calculate($request);
+            $response = $billSplitService->calculate($request);
+
+            // test
+            var_dump($response);
         } catch (\Exception $ex) {
             return redirect('/')
                 ->withErrors($ex->getMessage());

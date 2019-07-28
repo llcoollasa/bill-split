@@ -15,7 +15,7 @@ class HandleUploadPost extends FormRequest
     public function rules()
     {
         return [
-            'jsonFile' => ['nullable', new JsonFile],
+            'jsonFile' => ['nullable', 'mimes:txt', new JsonFile],
             'jsonText' => 'nullable|json'
         ];
     }
@@ -23,8 +23,7 @@ class HandleUploadPost extends FormRequest
     public function messages()
     {
         return [
-            'jsonFile.file' => 'A title is required',
-            'jsonFile.max'  => 'A message is required',
+            'jsonFile.mimes'  => 'Only allowed text files',
             'jsonText.json'  => 'Text should be valid json',
         ];
     }
