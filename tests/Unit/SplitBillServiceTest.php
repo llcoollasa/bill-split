@@ -65,4 +65,14 @@ class FileTest extends TestCase
         $splitBillService->storeJsonFile($json);
         Storage::disk('local')->assertExists('files/'. $fileName);
     }
+    
+    public function test_validate_json_schema_should_be_valid() {
+      $splitBillService = new SplitBillService();
+      $this->assertTrue($splitBillService->isJsonSchemaValid($this->getJsonData()));
+    }
+
+    public function test_validate_json_schema_should_be_invalid() {
+      $splitBillService = new SplitBillService();      
+      $this->assertFalse($splitBillService->isJsonSchemaValid('{}'));
+    }
 }

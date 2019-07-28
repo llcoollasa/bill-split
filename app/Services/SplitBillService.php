@@ -44,9 +44,46 @@ class SplitBillService implements SplitBillServiceInterface
         );
     }
     
-    public function validateJsonSchema($jsonArray) {
-        $multiplied = $collection->map(function ($item, $key) {
-            return $item * 2;
-        });
+    public function isJsonSchemaValid($json) {
+        try {
+            $jsonContent = json_decode($json, true);
+
+            if (!isset($jsonContent['data'])) return false;
+
+            $validItems = collect($jsonContent['data'])->map(function ($item) {
+                // validate day
+                if (!isset($item['day']) || empty($item['day'])) return false;
+                
+                // validate amount
+                if (!isset($item['amount']) || empty($item['amount'])) return false;
+
+                // validate paid_by
+                if (!isset($item['paid_by']) || empty($item['paid_by'])) return false;
+
+                // validate friends
+                if (!isset($item['friends']) || empty($item['friends'])) return false;
+ 
+                 
+                $fValid = true;
+                foreach ($item['friends'] as $friend) {
+                    if (empty($friend))  { 
+                        $fValid = false;  
+                        break;
+                    } 
+                } 
+
+                
+                return ($fValid ) ? true : false;
+            });
+
+            $valid = $validItems->reduce(function ($carry, $item) {
+                return $carry && $item;
+            }, true);
+            
+            return $valid;
+            
+        } catch (\Exception $ex) {
+            throw new \Exception('Please provide valid JSON');
+        }
     }
 }
