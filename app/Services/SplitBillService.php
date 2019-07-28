@@ -1,9 +1,7 @@
 <?php
 namespace App\Services;
 
-use App\Http\Requests\HandleUploadPost;
 use Carbon\Carbon;
-use Storage;
 use Illuminate\Http\UploadedFile;
 class SplitBillService implements SplitBillServiceInterface
 {
@@ -14,23 +12,16 @@ class SplitBillService implements SplitBillServiceInterface
     // How much each user owes. (If there are minus values the ignore them)
     // Automatically generated a settlement combination. 
 
-    public function calculate(HandleUploadPost $request)
+    private $jsonArray = [];
+
+    public function calculate($jsonContent)
     {
-        $jsonContent = null;
-        // File preparation
-        if ($request->hasFile('jsonFile')) {
-            $fileContent = Storage::get($this->storeJsonFile($request->file('jsonFile')));
-            $jsonContent = json_decode($fileContent, true);
-        }
-
-        // Text preparation
-        if (!empty($request->jsonText)) {
-            $jsonContent = json_decode($fileContent, true);
-        }
-
+        // process calculation
         if ($jsonContent) {
-            // process calculation
-            return $jsonContent;
+            if ($this->isJsonSchemaValid($jsonContent)) {
+                $this->jsonArray = collect(json_decode($jsonContent, true)['data']);
+                return $this->jsonArray;
+            }
         } else {
             throw new \Exception('Please provide JSON formatted text using file upload or in Text area');
         }
@@ -85,5 +76,9 @@ class SplitBillService implements SplitBillServiceInterface
         } catch (\Exception $ex) {
             throw new \Exception('Please provide valid JSON');
         }
+    }
+
+    public function getTotalDays() { 
+        return count($this->jsonArray);
     }
 }

@@ -75,4 +75,10 @@ class FileTest extends TestCase
       $splitBillService = new SplitBillService();      
       $this->assertFalse($splitBillService->isJsonSchemaValid('{}'));
     }
+
+    public function test_get_total_days() {
+      $splitBillService = new SplitBillService(); 
+      $splitBillService->calculate($this->getJsonData());
+      $this->assertEquals($splitBillService->getTotalDays(), 3);
+    }
 }
