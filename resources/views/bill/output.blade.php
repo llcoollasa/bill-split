@@ -29,7 +29,9 @@
                 <div class="card">
                     <div class="card-body text-center">
                         <h5>Total Number of Days</h5>
-                        <div><h2>12</h2></div>
+                        <div>
+                            <h2>{{$data['totalDays']}}</h2>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -37,7 +39,9 @@
                 <div class="card">
                     <div class="card-body text-center">
                         <h5>Total Amount spent by all Friends</h5>
-                        <div><h2>12</h2></div>
+                        <div>
+                            <h2>{{$data['totalSpentAmount']}}</h2>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -46,7 +50,7 @@
         <div class="row mt-2">
             <div class="col">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-body">                        
                         <h5>How much each Friend has spent</h5>
                         <table class="table">
                             <thead>
@@ -56,18 +60,12 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach ($data['totalAmountForEach'] as $name => $amount)                            
                                 <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
+                                    <td scope="row" class="text-capitalize">{{$name}}</th>
+                                    <td>{{$amount}}</td>
                                 </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Jacob</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>Larry</td>
-                                </tr>
+                                @endforeach
                             </tbody>
                         </table>                              
                     </div>
@@ -88,18 +86,12 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach ($data['totalAmountOwesByEach'] as $name => $amount)                      
                                 <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
+                                    <td scope="row" class="text-capitalize">{{$name}}</th>
+                                    <td>{{$amount}}</td>
                                 </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Jacob</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>Larry</td>
-                                </tr>
+                                @endforeach
                             </tbody>
                         </table>                              
                     </div>
@@ -121,27 +113,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Mark</td>
-                                    <td>Mark</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Jacob</td>
-                                    <td>Jacob</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>Larry</td>
-                                    <td>Larry</td>
-                                </tr>
+                                @foreach ($data['combinationOfTotalAmountOwesByEach'] as $user => $paidList)
+                                    @foreach ($paidList as $key => $value)   
+                                    <tr>
+                                        <td scope="row" class="text-capitalize">{{$user}}</th>
+                                        <td class="text-capitalize">{{$key}}</td>
+                                        <td>{{$value}}</td>
+                                    </tr>
+                                    @endforeach
+                                @endforeach
                             </tbody>
                         </table>                              
                     </div>
                 </div>
             </div>                
         </div>
+    
         <div class="mt-2 mb-2">
             <button type="button" class="btn btn-dark" onclick="window.location='{{ url("/") }}'">Home Page</button>
 

@@ -5,22 +5,14 @@ use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 class SplitBillService implements SplitBillServiceInterface
 {
-    // TODO: Handlle following methods
-    // Total number of days [done]
-    // Total amount spent by all friends [done]
-    // How much each friend has spent. (If I bring someone outside of the circle, then it comes under my account ) [done]
-    // How much each user owes. (If there are minus values the ignore them)
-    // Automatically generated a settlement combination. 
-
     private $jsonArray = [];
+    private $eachFriendOwes = [];
 
-    public function calculate($jsonContent)
+    public function prepareJsonArray($jsonContent)
     {
-        // process calculation
         if ($jsonContent) {
             if ($this->isJsonSchemaValid($jsonContent)) {
                 $this->jsonArray = collect(json_decode($jsonContent, true)['data']);
-                return $this->jsonArray;
             }
         } else {
             throw new \Exception('Please provide JSON formatted text using file upload or in Text area');
@@ -53,8 +45,7 @@ class SplitBillService implements SplitBillServiceInterface
 
                 // validate friends
                 if (!isset($item['friends']) || empty($item['friends'])) return false;
- 
-                 
+
                 $fValid = true;
                 foreach ($item['friends'] as $friend) {
                     if (empty($friend))  { 
@@ -62,7 +53,6 @@ class SplitBillService implements SplitBillServiceInterface
                         break;
                     } 
                 } 
-
                 
                 return ($fValid ) ? true : false;
             });
@@ -103,7 +93,8 @@ class SplitBillService implements SplitBillServiceInterface
     }
 
     public function getEachFriendOwesAmount() {
-        return $this->jsonArray->reduce(function ($carry, $item) {
+
+        $this->eachFriendOwes = $this->jsonArray->reduce(function ($carry, $item) {
             $paidBy = $item['paid_by'];
             $amount = $item['amount'];
             $friendsCount = count($item['friends']);
@@ -120,5 +111,25 @@ class SplitBillService implements SplitBillServiceInterface
             }
             return $carry;
         }, []);
+
+        return $this->eachFriendOwes;
+    }
+
+    public function getTotalOweAmountByEachFriend() {
+        if (empty($this->eachFriendOwes)) {
+            $this->getEachFriendOwesAmount();
+        } 
+
+        $totalOweList = [];
+        foreach ($this->eachFriendOwes as $user => $paidList) {            
+            foreach ($paidList as $key => $value) {
+                if (empty($totalOweList[$user])) {
+                    $totalOweList[$user] = $value;
+                } else {
+                    $totalOweList[$user] += $value;
+                }
+            }
+        }
+        return $totalOweList;
     }
 }

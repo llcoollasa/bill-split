@@ -21,10 +21,15 @@ class BillController extends Controller
             if (!empty($request->jsonText)) {
                 $jsonContent = $request->jsonText;
             }
-            $response = $billSplitService->calculate($jsonContent);
 
-            // test
-            return \Response::json($response);
+            $billSplitService->prepareJsonArray($jsonContent);
+            $data['totalDays'] = $billSplitService->getTotalDays();
+            $data['totalSpentAmount'] = $billSplitService->getTotalSpentAmount();
+            $data['totalAmountForEach'] = $billSplitService->getTotalAmountSpentByEachFriend();
+            $data['totalAmountOwesByEach'] = $billSplitService->getTotalOweAmountByEachFriend();
+            $data['combinationOfTotalAmountOwesByEach'] = $billSplitService->getEachFriendOwesAmount();
+
+            return view('bill.output', compact("data"));
         } catch (\Exception $ex) {
             return redirect('/')
                 ->withErrors($ex->getMessage());

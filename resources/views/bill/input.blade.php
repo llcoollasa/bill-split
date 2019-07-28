@@ -45,7 +45,7 @@
                                 <textarea 
                                     class="form-control" 
                                     id="exampleFormControlTextarea1" 
-                                    rows="3"
+                                    rows="15"
                                     placeholder="Paste your Json formatted text here..." 
                                     name="jsonText" >{{old('jsonText')}}</textarea>
                             </div>
