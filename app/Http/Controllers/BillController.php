@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\HandleUploadPost;
+use App\Services\SplitBillServiceInterface;
 
 class BillController extends Controller
 {
-    public function handleUpload(Request $request) {
-        // validate upload 
- 
+    public function handleUpload(HandleUploadPost $request, SplitBillServiceInterface $billSplitService) {
+        $jsonContent = null;
 
-        if ($request->hasFile('file')) { 
-            $fileName   = time() . '.json';
-             
-            $path = $request->file('file')->storeAs(
-                'files', $fileName
-            );
+        try {
+            $billSplitService->calculate($request);
+        } catch (\Exception $ex) {
+            return redirect('/')
+                ->withErrors($ex->getMessage());
         }
     }
 }

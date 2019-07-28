@@ -23,3 +23,9 @@ You can mount the volume for the development purposes using
 ```
 docker run -p 8181:8181 -v $(pwd):/app --name app bill-split
 ```
+
+3. Run Test cases
+
+```
+./vendor/bin/phpunit
+```

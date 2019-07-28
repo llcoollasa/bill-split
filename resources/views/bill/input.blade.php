@@ -10,76 +10,61 @@
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
 
         <!-- Styles -->
-        <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Nunito', sans-serif;
-                font-weight: 200; 
-                margin: 0;
-            }
- 
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 13px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
-        </style>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     </head>
     <body>
-        <div class="flex-center position-ref full-height">
-            <div class="content">
-                <div class="title m-b-md">
-                    Split bills
-                </div>
 
+    <div class="container">
+        <div class="row">
+            <div class="col">
                 <div>
-                <form method="POST" action="/upload" enctype="multipart/form-data">
-                    @csrf
-                    <div class="col-md-6">
-                        <input type="file" name="file" class="form-control">
-                    </div>
-                    <div class="col-md-6">
-                        <textarea name="json" rows="20" cols="50" placeholder="Paste your json here...">
-                        </textarea>
-                    </div>
-                    <button type="submit" class="btn btn-success">Submit</button>
-                </form>
+                    <h1>Split Bills</h1>
                 </div>
-            </div>
+                <div>
+                    <form method="POST" action="/upload" enctype="multipart/form-data">
+                        @csrf
+                        <div> 
+                            <div>
+                                <p>Upload Json File or</p>
+                            </div>
+
+                            <div class="input-group mb-3">                            
+                                <div class="custom-file">
+                                    <input name="jsonFile" type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label for="exampleFormControlTextarea1">Paste json formatted text to proceed.</label>
+                                <textarea 
+                                    class="form-control" 
+                                    id="exampleFormControlTextarea1" 
+                                    rows="3"
+                                    placeholder="Paste your Json formatted text here..." 
+                                    name="jsonText" >{{old('jsonText')}}</textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </form>
+                </div>
+                <div class="m-4">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            @foreach ($errors->all() as $error)
+                                <div>{{ $error }}</div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>  
         </div>
+    </div>
+
     </body>
 </html>

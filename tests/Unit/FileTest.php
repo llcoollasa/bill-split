@@ -7,27 +7,43 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
+use Carbon\Carbon;
 
 class FileTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     */
     public function testFileUpload()
     {
-        Storage::fake('avatars');
-        $json = UploadedFile::fake()->create('document.json', 10);
+        $knownDate = Carbon::create(2001, 5, 21, 12);
+        Carbon::setTestNow($knownDate);
+
+        $fileName = '990446400.json';
+        $fileSize = 200;
+
+        Storage::fake('local');
+        $json = UploadedFile::fake()->create($fileName, $fileSize);
         
         $response = $this->json('POST', '/upload', [
-            'file' => $json
+            'jsonFile' => $json
         ]);
+        
+        Storage::disk('local')->assertExists('files/'. $fileName);
+    }
 
-        // Assert the file was stored...
-        Storage::disk('local')->assertExists('/files/document.json');
+    public function validateJsonText()
+    {
+        $knownDate = Carbon::create(2001, 5, 21, 12);
+        Carbon::setTestNow($knownDate);
 
-        // Assert a file does not exist...
-        Storage::disk('local')->assertMissing('/files/document.json');
+        $fileName = '990446400.json';
+        $fileSize = 200;
+
+        Storage::fake('local');
+        $json = UploadedFile::fake()->create($fileName, $fileSize);
+        
+        $response = $this->json('POST', '/upload', [
+            'jsonFile' => $json
+        ]);
+        
+        Storage::disk('local')->assertExists('files/'. $fileName);
     }
 }
